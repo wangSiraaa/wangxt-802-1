@@ -75,9 +75,26 @@ const createTables = () => {
         is_overweight BOOLEAN NOT NULL DEFAULT 0,
         status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
         filled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        idempotency_key TEXT UNIQUE,
         FOREIGN KEY (batch_id) REFERENCES filling_batches(id),
         FOREIGN KEY (cylinder_id) REFERENCES cylinders(id),
         FOREIGN KEY (operator_id) REFERENCES users(id)
+      )`);
+
+      db.run(`CREATE TABLE IF NOT EXISTS idempotent_submissions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        idempotency_key TEXT UNIQUE NOT NULL,
+        request_type TEXT NOT NULL,
+        request_body TEXT,
+        status TEXT NOT NULL DEFAULT 'processing' CHECK(status IN ('processing', 'success', 'failed')),
+        before_state TEXT,
+        after_state TEXT,
+        response_data TEXT,
+        error_message TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        processed_at DATETIME,
+        resource_id INTEGER,
+        resource_type TEXT
       )`);
 
       db.run(`CREATE TABLE IF NOT EXISTS deliveries (
@@ -118,6 +135,8 @@ const createTables = () => {
       db.run(`CREATE INDEX IF NOT EXISTS idx_inspection_cylinder ON inspections(cylinder_id)`);
       db.run(`CREATE INDEX IF NOT EXISTS idx_filling_batch ON filling_records(batch_id)`);
       db.run(`CREATE INDEX IF NOT EXISTS idx_delivery_customer ON deliveries(customer_id)`);
+      db.run(`CREATE INDEX IF NOT EXISTS idx_idempotency_key ON idempotent_submissions(idempotency_key)`);
+      db.run(`CREATE INDEX IF NOT EXISTS idx_filling_record_idempotency ON filling_records(idempotency_key)`);
 
       console.log('数据库表创建成功');
       resolve();
