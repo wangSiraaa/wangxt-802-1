@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "cylinder trace api",
   "main": "src/server.js",
-  "scripts": {
+ "scripts": {
     "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "init": "node src/scripts/initDB.js",
     "seed": "node src/scripts/seedData.js",
+    "setup": "node src/scripts/setup.js",
     "test": "node src/scripts/verify.js"
-  },
-  "dependencies": {
+  },"dependencies": {
     "express": "^4.18.2",
     "sqlite3": "^5.1.6",
     "body-parser": "^1.20.2",

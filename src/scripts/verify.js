@@ -1,7 +1,7 @@
 const http = require('http');
 
-const BASE_URL = 'localhost';
-const PORT = 3008;
+const BASE_URL = process.env.API_HOST || 'localhost';
+const PORT = parseInt(process.env.API_PORT || process.env.PORT || '3008', 10);
 
 let testResults = [];
 let passed = 0;
